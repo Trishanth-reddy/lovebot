@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❤️ Love Chat - NIAT Hackathon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #ff4b6e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+        .user-message {
+            background: #e3f2fd;
+            margin-left: auto;
+        }
+        .bot-message {
+            background: #fce4ec;
+            margin-right: auto;
+        }
+        .input-area {
+            padding: 20px;
+            background: white;
+            display: flex;
+            gap: 10px;
+        }
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ff4b6e;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1em;
+        }
+        #send-button {
+            background: #ff4b6e;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Love Chat 💖</div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">Hi there! I'm your Valentine's AI companion. Let's chat! 🌹</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button">Send ❤️</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const API_KEY = "AIzaSyAnVAtKWzgN34WvD0Is1g1lk1hPEKcREUU";
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function getAIResponse(userMessage) {
+            try {
+                const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateText?key=" + API_KEY, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: userMessage })
+                });
+                const data = await response.json();
+                return data.candidates?.[0]?.output || "I couldn't process that, but I'm here for you! 💖";
+            } catch (error) {
+                return "Oops! Something went wrong. Try again. 💔";
+            }
+        }
+
+        async function handleSend() {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                userInput.value = '';
+                const botResponse = await getAIResponse(message);
+                addMessage(botResponse);
+            }
+        }
+
+        sendButton.addEventListener('click', handleSend);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    </script>
+</body>
+</html>
